@@ -22,7 +22,7 @@ A Python script that displays your running QEMU virtual machines as Discord Rich
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/qemu-discord-rpc.git
+git clone https://github.com/qubixq/qemu-discord-rpc.git
 cd qemu-discord-rpc
 ```
 
