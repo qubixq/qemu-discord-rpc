@@ -5,11 +5,13 @@ A Python script that displays your running QEMU virtual machines as Discord Rich
 ## Features
 
 - 🖥️ Automatically detects running QEMU virtual machines
-- 🎮 Shows VM status on your Discord profile
+- 🎮 Shows VM status on your Discord profile with runtime
 - ⏱️ Displays how long the VM has been running
-- 🔄 Real-time updates every 15 seconds
+- 🔄 Real-time updates (configurable interval)
 - 💾 Saves Discord application settings locally
+- ⚙️ Easy configuration management with built-in editor
 - 🚀 Lightweight and easy to use
+- 📦 Multiple installation options
 
 ## Prerequisites
 
@@ -17,109 +19,203 @@ A Python script that displays your running QEMU virtual machines as Discord Rich
 - Discord application
 - QEMU virtual machines
 - Linux/Unix system (uses `ps aux` command)
+- nano text editor (for config editing)
 
 ## Installation
 
-1. Clone this repository:
+### Option 1: Using pipx (Recommended)
+
+pipx installs packages in isolated environments and makes them available globally:
+
+```bash
+# Install pipx if you don't have it
+pip install pipx
+
+# Install QEMU Discord RPC
+pipx install qemu-discord-rpc
+
+# Run anywhere
+qemu-discord-rpc
+```
+
+### Option 2: Using pip
+
+```bash
+pip install qemu-discord-rpc
+```
+
+### Option 3: From Source
+
 ```bash
 git clone https://github.com/qubixq/qemu-discord-rpc.git
 cd qemu-discord-rpc
+pip install .
 ```
 
-2. Install required dependencies:
+### Option 4: Development Installation
+
 ```bash
-pip install pypresence
+git clone https://github.com/qubixq/qemu-discord-rpc.git
+cd qemu-discord-rpc
+pip install -e .
 ```
 
-## Setup
+## Quick Start
 
-### 1. Create a Discord Application
+1. **Create a Discord Application**
+   - Go to [Discord Developer Portal](https://discord.com/developers/applications)
+   - Click "New Application" and name it (e.g., "QEMU VM Status")
+   - Copy the **Application ID** (Client ID)
 
-1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
-2. Click "New Application" and give it a name (e.g., "QEMU VM Status")
-3. Copy the **Application ID** (Client ID) from the General Information page
-4. You can also upload a custom icon for your application
+2. **Run the application**
+   ```bash
+   qemu-discord-rpc
+   ```
 
-### 2. Configure the Script
+3. **First-time setup**
+   - Enter your Discord Application Client ID when prompted
+   - The script will save your settings automatically
 
-1. Run the script for the first time:
-```bash
-python qemu_discord_rpc.py
-```
-
-2. When prompted, enter your Discord Application Client ID
-3. The script will save this ID to `config.json` for future use
+That's it! Your QEMU VMs will now appear in your Discord status.
 
 ## Usage
 
-Simply run the script while your QEMU virtual machines are running:
+### Basic Commands
 
 ```bash
-python qemu_discord_rpc.py
+# Start the Discord RPC service
+qemu-discord-rpc
+
+# Edit configuration file
+qemu-discord-rpc --config
+
+# Show help
+qemu-discord-rpc --help
+
+# Show version
+qemu-discord-rpc --version
 ```
 
-The script will:
-- Detect running QEMU VMs by looking for `guest=` parameter in process list
-- Update your Discord status to show the VM name and runtime
-- Continue monitoring until you stop it with `Ctrl+C`
-
-### Example Discord Status
+### Discord Status Example
 ```
 🖥️ Playing QEMU VM
 Windows-11 VM is running
+Virtualization with QEMU VM
 Started 25 minutes ago
 ```
 
 ## Configuration
 
-The script creates a `config.json` file to store your Discord Application Client ID:
+### Automatic Configuration
+On first run, the script will create a `config.json` file with your settings.
+
+### Manual Configuration
+Use the built-in config editor:
+```bash
+qemu-discord-rpc --config
+```
+
+This opens the configuration file in nano editor where you can modify:
 
 ```json
 {
-    "client_id": "your_discord_application_id_here"
+    "client_id": "your_discord_application_id",
+    "update_interval": 15,
+    "app_name": "QEMU VM"
 }
 ```
 
-You can manually edit this file if needed, or delete it to reconfigure.
+**Configuration Options:**
+- `client_id`: Your Discord Application Client ID
+- `update_interval`: How often to check for VMs (seconds, default: 15)
+- `app_name`: Application name shown in Discord status
 
-## How It Works
+### Manual Config Editing
+You can also edit `config.json` directly in any text editor.
 
-1. **VM Detection**: Uses `ps aux` to find QEMU processes
-2. **Name Extraction**: Parses the `guest=` parameter from QEMU command line
-3. **Discord RPC**: Uses pypresence library to communicate with Discord
-4. **Status Updates**: Updates every 15 seconds, clears when no VMs are running
+## Advanced Setup
 
-## Requirements
+### Creating a Custom Discord Application Icon
 
-- `pypresence` - Discord Rich Presence library for Python
+1. Go to your Discord Application in the Developer Portal
+2. Navigate to "Rich Presence" → "Art Assets"
+3. Upload an icon named `qemu-logo` (this matches the script)
+4. Your VM status will now show your custom icon!
 
-Install with:
+### VM Detection Requirements
+
+Your QEMU command must include the `guest=` parameter for detection:
 ```bash
-pip install pypresence
+qemu-system-x86_64 -name guest=MyVM,debug-threads=on ...
 ```
 
 ## Troubleshooting
 
-### Script doesn't detect VMs
-- Ensure your QEMU command includes the `guest=` parameter
-- Check that QEMU processes are visible with `ps aux | grep qemu`
+### Common Issues
 
-### Discord status not showing
-- Make sure Discord is running and you're logged in
-- Verify your Discord Application Client ID is correct
-- Check that your Discord privacy settings allow Rich Presence
+**VMs not detected:**
+- Ensure QEMU processes include `guest=` parameter
+- Test detection: `ps aux | grep qemu`
+- Check that QEMU is actually running
 
-### Multiple VMs
-- Currently shows only the first detected VM
-- Feel free to modify the script for multiple VM support
+**Discord status not showing:**
+- Verify Discord is running and you're logged in
+- Check Discord privacy settings allow Rich Presence
+- Confirm Client ID is correct (use `--config` to update)
+
+**Config editor not working:**
+- Install nano: `sudo apt install nano` (Ubuntu/Debian)
+- Or edit `config.json` manually in any text editor
+
+### Installation Issues
+
+**Command not found after pip install:**
+```bash
+# Try reinstalling with --user flag
+pip install --user qemu-discord-rpc
+
+# Or use pipx (recommended)
+pipx install qemu-discord-rpc
+```
+
+**Permission issues:**
+```bash
+# Use pipx to avoid permission issues
+pipx install qemu-discord-rpc
+
+# Or install with --user flag
+pip install --user qemu-discord-rpc
+```
+
+## Development
+
+### Running from Source
+```bash
+git clone https://github.com/qubixq/qemu-discord-rpc.git
+cd qemu-discord-rpc
+python -m qemu_discord_rpc
+```
+
+### Building
+```bash
+pip install build
+python -m build
+```
 
 ## Contributing
 
 Contributions are welcome! Please feel free to:
-- Report bugs
-- Suggest new features
-- Submit pull requests
-- Improve documentation
+- 🐛 Report bugs
+- 💡 Suggest new features  
+- 🔧 Submit pull requests
+- 📚 Improve documentation
+
+### Development Setup
+```bash
+git clone https://github.com/qubixq/qemu-discord-rpc.git
+cd qemu-discord-rpc
+pip install -e .[dev]
+```
 
 ## License
 
@@ -129,7 +225,26 @@ This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) 
 
 - [pypresence](https://github.com/qwertyquerty/pypresence) - Discord RPC library
 - QEMU community for the amazing virtualization platform
+- All contributors and users of this project
+
+## Changelog
+
+### v1.0.3
+- ✨ Added configuration management with `--config` option
+- ✨ Added command-line help and startup information
+- ✨ Improved error handling and user feedback
+- ✨ Added configurable update interval
+- 📚 Updated installation options (pipx support)
+
+### v1.0.2
+- 🐛 Bug fixes and stability improvements
+- 📚 Documentation updates
+
+### v1.0.1
+- 🚀 Initial release
 
 ---
 
-**Note**: This script is designed for Linux/Unix systems.
+**Note**: This script is designed for Linux/Unix systems and requires Discord to be running for Rich Presence to work.
+
+For support, please open an issue on [GitHub](https://github.com/qubixq/qemu-discord-rpc/issues).
